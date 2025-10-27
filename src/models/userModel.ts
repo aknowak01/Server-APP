@@ -1,11 +1,15 @@
 import mongoose, { Schema, Document } from 'mongoose'
 import bcrypt from 'bcrypt'
 
+export type Role = 'USER' | 'ADMIN'
+
 export interface IUser extends Document {
     email: string
     password: string
-    role: String
-    comparePassword(candidatePassword: string): Promise <boolean>
+    role: Role
+    isActive: boolean
+    permissions: string[]
+    comparePassword(candidate: string): Promise<boolean>
 }
 
 const userSchema = new Schema<IUser>({
@@ -15,27 +19,63 @@ const userSchema = new Schema<IUser>({
         unique: true,
         lowercase: true,
         trim: true,
+        match: [/^\S+@\S+\.\S+$/, 'Invalid email address'],
     },
     password: {
-        type:String,
+        type: String,
         required: true,
+        minlength: 6,
+        select: false, // ← nie zwracaj hasła domyślnie
     },
     role: {
         type: String,
-        default: 'user',
+        enum: ['USER', 'ADMIN'],
+        default: 'USER',
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    permissions: {
+        type: [String],
+        default: [],
+    },
+}, {
+    timestamps: true,
+    versionKey: false,
+    toJSON: {
+        transform(_doc, ret: any) {
+            delete ret.password
+            return ret
+        }
     }
 })
 
-userSchema.pre('save', async function (next) {
-    if(!this.isModified('password')) return next()
+// Hashowanie hasła przy save
+userSchema.pre<IUser>('save', async function (next) {
+    if (!this.isModified('password')) return next()
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
     next()
 })
 
+// (Opcjonalnie) Hash przy findOneAndUpdate, gdy zmieniasz hasło tym sposobem
+userSchema.pre('findOneAndUpdate', async function (next) {
+    const update = this.getUpdate() as any
+    if (update?.password) {
+        const salt = await bcrypt.genSalt(10)
+        update.password = await bcrypt.hash(update.password, salt)
+        this.setUpdate(update)
+    }
+    next()
+})
 
-userSchema.methods.comparePassword = async function (candidate: string ) {
+// Porównanie haseł
+userSchema.methods.comparePassword = async function (this: IUser, candidate: string) {
+    // Uwaga: jeśli pobierasz usera bez select('+password'), this.password może być undefined
     return bcrypt.compare(candidate, this.password)
 }
+
+userSchema.index({ email: 1 }, { unique: true })
 
 export default mongoose.model<IUser>('User', userSchema)
