@@ -29,24 +29,34 @@ export const register = async(req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
-        const { email, password } = req.body;
-        if ( !email || !password) return res.status(400).json({error: 'Email and password are required'});
-        const user = await User.findOne({ email });
+        const { email, password } = req.body ?? {}
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email i hasło są wymagane' })
+        }
+        const user = await User.findOne({ email, isActive: { $ne: false } }).select('+password')
         if (!user) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ error: 'Zły email lub hasło' })
         }
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+        const ok = await (user as any).comparePassword(password)
+        if (!ok) {
+            return res.status(401).json({ error: 'Zły email lub hasło' })
         }
+
+
+        /// TODO: dodać jutro RBAC i permissions do token a potem do usera w response i zrobić middleware requirePermission
         const token = signAccessToken({
             sub: user.id,
             role: user.role as 'ADMIN' | 'USER',
             permissions: []
-        });
-        res.json({token, user: user.id, email: user.email, role: user.role, name: user.get('name') });
+        })
+
+        return res.json({
+            token,
+            user: { id: user.id, email: user.email, role: user.role, name: (user as any).name }
+        })
     } catch (err) {
-        res.status(400).json({error: 'Server error'});
+        console.error('login error:', err)
+        return res.status(500).json({ error: 'Błąd serwera' })
     }
 }
 
