@@ -64,6 +64,7 @@ export const me = async (req: Request, res: Response) => {
     const { user } = req as any
     if(!user) return res.status(401).json({error: 'Unauthorized'});
     return res.json({ user })
+
 }
 
 
