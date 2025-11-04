@@ -51,7 +51,6 @@ const userSchema = new Schema<IUser>({
     }
 })
 
-// Hashowanie hasła przy save
 userSchema.pre<IUser>('save', async function (next) {
     if (!this.isModified('password')) return next()
     const salt = await bcrypt.genSalt(10)
@@ -59,7 +58,6 @@ userSchema.pre<IUser>('save', async function (next) {
     next()
 })
 
-// (Opcjonalnie) Hash przy findOneAndUpdate, gdy zmieniasz hasło tym sposobem
 userSchema.pre('findOneAndUpdate', async function (next) {
     const update = this.getUpdate() as any
     if (update?.password) {
@@ -72,10 +70,9 @@ userSchema.pre('findOneAndUpdate', async function (next) {
 
 // Porównanie haseł
 userSchema.methods.comparePassword = async function (this: IUser, candidate: string) {
-    // Uwaga: jeśli pobierasz usera bez select('+password'), this.password może być undefined
     return bcrypt.compare(candidate, this.password)
 }
 
 userSchema.index({ email: 1 }, { unique: true })
 
-export default mongoose.model<IUser>('User', userSchema)
+export default mongoose.model<IUser>('USER', userSchema)

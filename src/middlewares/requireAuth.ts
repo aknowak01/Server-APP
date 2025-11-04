@@ -1,21 +1,26 @@
-import { Request, Response,NextFunction } from  "express";
-import {JwtPayload} from "jsonwebtoken";
-import {verifyAccessToken} from "../services/tokenService";
+import { Request, Response, NextFunction } from "express";
+import { verifyAccessToken, JwtPayLoad } from "../services/tokenService";
 
 export interface AuthRequest extends Request {
-    user?: JwtPayload;
+    user?: JwtPayLoad;
+    userId?: string;
 }
 
 export function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
-    const header = req.headers.authorization
-    if(!header?.startsWith('Bearer')) {
-        return res.status(401).send("Not authorized")
+    const auth = req.headers.authorization;
+    if (!auth) return res.status(401).json({ error: "Brak nagłówka Authorization" });
+
+    const [scheme, token] = auth.split(" ");
+    if (scheme !== "Bearer" || !token) {
+        return res.status(401).json({ error: "Zły format nagłówka Authorization (Bearer <token>)" });
     }
-    const token = header.slice(7)
+
     try {
-        req.user =  verifyAccessToken(token)
+        const payload = verifyAccessToken(token);
+        req.user = payload;
+        req.userId = payload.sub;
         return next();
     } catch {
-        return res.status(401).send("Bad Token or expired")
+        return res.status(401).json({ error: "Nieprawidłowy lub wygasły token" });
     }
 }
