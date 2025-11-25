@@ -28,6 +28,23 @@ export const register = async(req: Request, res: Response) => {
     }
 }
 
+export const verifyEmail = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body ?? {}
+        if (!email) {
+            return res.status(400).json({ error: 'Email jest wymagany' })
+        }
+        const user = await User.findOne({ email })
+        if (user) {
+            return res.status(409).json({ error: 'Email jest już zarejestrowany' })
+        }
+        return res.json({ message: 'Email jest dostępny' })
+    } catch (err) {
+        console.error('verifyEmail error:', err)
+        return res.status(500).json({ error: 'Błąd serwera' })
+    }
+}
+
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body ?? {}
@@ -45,6 +62,7 @@ export const login = async (req: Request, res: Response) => {
         const token = signAccessToken({
             sub: user.id,
             role: user.role as 'ADMIN' | 'USER',
+
             permissions: []
         })
 
@@ -59,10 +77,10 @@ export const login = async (req: Request, res: Response) => {
 }
 
 export const me = async (req: AuthRequest, res: Response) => {
-    const userId= req.user?.sub;
-    const  user  = await User.findById(userId)
+    const userId = req.user?.sub;
+    const user = await User.findById(userId)
         .select('_id email role name permissions createdAt updatedAt')
-    return res.json({ user })
+    return res.json({user})
 
 }
 
