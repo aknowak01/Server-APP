@@ -1,14 +1,14 @@
 import mongoose, {Document, Schema} from 'mongoose';
 
-export enum PermissionFlag {
+export enum MainPermissionFlags {
     FORM_VIEW = 'form_view',
     FORM_ADD = 'form_add',
     FORM_EDIT = 'form_edit',
     QUALITY_CONTROL = 'quality_control',
-    QUALITY_CONTROL_EDIT_ODZIEZ_MAGAZYN = 'quality_control_edit_odziez_magazyn',
-    QUALITY_CONTROL_EDIT_SZWALNIA_KROJOWNIA = 'quality_control_edit_szwalnia_krojownia',
-    QUALITY_CONTROL_EDIT_ZNAKOWANIE = 'quality_control_edit_znakowanie',
-    QUALITY_CONTROL_EDIT_KONFEKCJA = 'quality_control_edit_konfekcja',
+    QUALITY_CONTROL_EDIT_PACKING = 'quality_control_edit_packing',
+    QUALITY_CONTROL_EDIT_SEWING_CUTTING = 'quality_control_edit_sewing_cutting',
+    QUALITY_CONTROL_EDIT_WAREHOUSE = 'quality_control_edit_warehouse',
+    QUALITY_CONTROL_EDIT_MARKING = 'quality_control_edit_marking',
     USER_REGISTRATION = 'user_registration',
 }
 
@@ -16,61 +16,86 @@ export enum Role {
     ADMIN = 'ADMIN',
     USER = 'USER',
     MANAGER = 'MANAGER',
-    SUPERVISOR_ODZIEZ_MAGAZYN = 'SUPERVISOR_ODZIEZ_MAGAZYN',
-    SUPERVISOR_SZWALNIA_KROJOWNIA = 'SUPERVISOR_SZWALNIA_KROJOWNIA',
-    SUPERVISOR_ZNAKOWANIE = 'SUPERVISOR_ZNAKOWANIE',
-    SUPERVISOR_KONFEKCJA = 'SUPERVISOR_KONFEKCJA',
+    SUPERVISOR_WAREHOUSE= 'SUPERVISOR_ODZIEZ_MAGAZYN',
+    SUPERVISOR_SEWING_CUTTING = 'SUPERVISOR_SZWALNIA_KROJOWNIA',
+    SUPERVISOR_MARKING = 'SUPERVISOR_ZNAKOWANIE',
+    SUPERVISOR_PACKING = 'SUPERVISOR_KONFEKCJA',
+    WAREHOUSE = 'WAREHOUSE',
+    SEWING_CUTTING = 'SEWING_CUTTING',
+    MARKING = 'MARKING',
+    PACKING = 'PACKING',
+
     VENDOR = 'VENDOR',
 }
 
 export const QC_EDIT_FLAGS = [
-    PermissionFlag.QUALITY_CONTROL,
-    PermissionFlag.QUALITY_CONTROL_EDIT_ODZIEZ_MAGAZYN,
-    PermissionFlag.QUALITY_CONTROL_EDIT_SZWALNIA_KROJOWNIA,
-    PermissionFlag.QUALITY_CONTROL_EDIT_ZNAKOWANIE,
-    PermissionFlag.QUALITY_CONTROL_EDIT_KONFEKCJA,
+    MainPermissionFlags.QUALITY_CONTROL,
+    MainPermissionFlags.QUALITY_CONTROL_EDIT_WAREHOUSE,
+    MainPermissionFlags.QUALITY_CONTROL_EDIT_SEWING_CUTTING,
+    MainPermissionFlags.QUALITY_CONTROL_EDIT_MARKING,
+    MainPermissionFlags.QUALITY_CONTROL_EDIT_PACKING,
 ];
 
-export const ROLE_FLAGS: Record<Role, PermissionFlag[]> = {
-    [Role.ADMIN]: Object.values(PermissionFlag),
-    [Role.USER]: [PermissionFlag.FORM_VIEW,],
-    [Role.MANAGER]: Object.values(PermissionFlag),
-    [Role.SUPERVISOR_ODZIEZ_MAGAZYN]: [
-        PermissionFlag.FORM_VIEW,
-        PermissionFlag.USER_REGISTRATION,
-        PermissionFlag.QUALITY_CONTROL_EDIT_ODZIEZ_MAGAZYN,
-        PermissionFlag.QUALITY_CONTROL,
+export const ROLE_FLAGS: Record<Role, MainPermissionFlags[]> = {
+    [Role.ADMIN]: Object.values(MainPermissionFlags),
+    [Role.USER]: [MainPermissionFlags.FORM_VIEW,],
+    [Role.MANAGER]: Object.values(MainPermissionFlags),
+    [Role.SUPERVISOR_WAREHOUSE]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.USER_REGISTRATION,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_WAREHOUSE,
+        MainPermissionFlags.QUALITY_CONTROL,
     ],
-    [Role.SUPERVISOR_SZWALNIA_KROJOWNIA]: [
-        PermissionFlag.FORM_VIEW,
-        PermissionFlag.USER_REGISTRATION,
-        PermissionFlag.QUALITY_CONTROL_EDIT_SZWALNIA_KROJOWNIA,
-        PermissionFlag.QUALITY_CONTROL,
+    [Role.SUPERVISOR_SEWING_CUTTING]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.USER_REGISTRATION,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_SEWING_CUTTING,
+        MainPermissionFlags.QUALITY_CONTROL,
     ],
-    [Role.SUPERVISOR_ZNAKOWANIE]: [
-        PermissionFlag.FORM_VIEW,
-        PermissionFlag.USER_REGISTRATION,
-        PermissionFlag.QUALITY_CONTROL_EDIT_ZNAKOWANIE,
-        PermissionFlag.QUALITY_CONTROL,
+    [Role.SUPERVISOR_MARKING]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.USER_REGISTRATION,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_MARKING,
+        MainPermissionFlags.QUALITY_CONTROL,
     ],
-    [Role.SUPERVISOR_KONFEKCJA]: [
-        PermissionFlag.FORM_VIEW,
-        PermissionFlag.USER_REGISTRATION,
-        PermissionFlag.QUALITY_CONTROL_EDIT_KONFEKCJA,
-        PermissionFlag.QUALITY_CONTROL,
+    [Role.SUPERVISOR_PACKING]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.USER_REGISTRATION,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_PACKING,
+        MainPermissionFlags.QUALITY_CONTROL,
+    ],
+    [Role.WAREHOUSE]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_WAREHOUSE,
+        MainPermissionFlags.QUALITY_CONTROL,
+    ],
+    [Role.SEWING_CUTTING]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_SEWING_CUTTING,
+        MainPermissionFlags.QUALITY_CONTROL,
+    ],
+    [Role.MARKING]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_MARKING,
+        MainPermissionFlags.QUALITY_CONTROL,
+    ],
+    [Role.PACKING]: [
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.QUALITY_CONTROL_EDIT_PACKING,
+        MainPermissionFlags.QUALITY_CONTROL,
     ],
     [Role.VENDOR]: [
-        PermissionFlag.FORM_ADD,
-        PermissionFlag.FORM_EDIT,
+        MainPermissionFlags.FORM_ADD,
+        MainPermissionFlags.FORM_EDIT,
         ...QC_EDIT_FLAGS,
-        PermissionFlag.FORM_VIEW,
-        PermissionFlag.QUALITY_CONTROL,
+        MainPermissionFlags.FORM_VIEW,
+        MainPermissionFlags.QUALITY_CONTROL,
     ],
 };
 
 export interface IRoleDoc extends Document {
     name: Role;
-    flags: PermissionFlag[];
+    flags: MainPermissionFlags[];
 }
 
 
@@ -78,7 +103,7 @@ const RoleSchema = new Schema<IRoleDoc>({
     name: {type: String, enum: Object.values(Role), required: true, unique: true},
     flags: {
         type: [String],
-        enum: Object.values(PermissionFlag),
+        enum: Object.values(MainPermissionFlags),
         required: true,
     },
 });

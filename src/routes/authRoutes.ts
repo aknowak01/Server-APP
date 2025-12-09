@@ -9,6 +9,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);
 router.get("/me",requireAuth, me);
+router.post( "/overwiev", requireRole('ADMIN'));
 
 export default router;
 
