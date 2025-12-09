@@ -1,6 +1,7 @@
 import express from "express";
 import {register, login, logout, me} from "../controllers/authController";
 import {requireAuth} from "../middlewares/requireAuth";
+import {requireRole} from "../middlewares/requireRole";
 
 const router = express.Router();
 

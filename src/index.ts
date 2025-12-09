@@ -4,6 +4,7 @@ dotenv.config()
 
 import app from './app'
 import mongoose from 'mongoose'
+import {seedRoles} from "./utils/seedRoles";
 
 /// Constants
 const PORT = 5000
@@ -40,3 +41,4 @@ async function bootstrap() {
 }
 
 bootstrap()
+seedRoles();

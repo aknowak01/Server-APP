@@ -12,6 +12,7 @@ router.get('/overview', requireAuth, requireRole('ADMIN'), (req: AuthRequest, re
         user: req.user,
     })
 })
+
 router.post('/permissions/grant', requireAuth, requireRole('ADMIN'), async (req, res) => {
     const { userId, permission } = req.body
     if (!userId || !permission) return res.status(400).json({ error: 'Brak danych wejściowych' })
