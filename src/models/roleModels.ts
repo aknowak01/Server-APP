@@ -93,10 +93,15 @@ export const ROLE_FLAGS: Record<Role, MainPermissionFlags[]> = {
     ],
 };
 
+ export const ALL_ROLES = Object.values(Role);
+
+
+
 export interface IRoleDoc extends Document {
     name: Role;
     flags: MainPermissionFlags[];
 }
+
 
 
 const RoleSchema = new Schema<IRoleDoc>({

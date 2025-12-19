@@ -84,6 +84,8 @@ export const me = async (req: AuthRequest, res: Response) => {
 
 }
 
+
+
 export const logout = async (req: Request, res: Response) => {
     try {
         res.json({ message: 'User logged out successfully' });

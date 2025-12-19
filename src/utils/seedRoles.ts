@@ -10,5 +10,8 @@ export async function seedRoles() {
             { upsert: true }
         );
     }
+
+
+
     console.log(`Seeding roles for ${roleKeys.length} roles.`);
 }
