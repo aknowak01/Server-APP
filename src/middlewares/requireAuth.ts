@@ -32,6 +32,10 @@ export function auth(req: Request, res: Response, next: NextFunction) {
     }
 
 }
+export default auth;
+
+
+
 
 export function clearAuth(req: AuthRequest, res: Response, next: NextFunction) {
     delete req.user;
