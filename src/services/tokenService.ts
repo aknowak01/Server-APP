@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
+import { Role } from '../models/roleModels'
 
 export interface JwtPayLoad {
     sub: string
-    role: 'ADMIN' | 'USER'
+    role: Role
     permissions?: string[]
 }
 

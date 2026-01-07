@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/userModel';
 import {signAccessToken} from "../services/tokenService";
 import {AuthRequest} from "../middlewares/requireAuth";
+import { Role } from '../models/roleModels'
 
 export const register = async(req: Request, res: Response) => {
     try {
@@ -17,7 +18,7 @@ export const register = async(req: Request, res: Response) => {
         await newUser.save();
         const token = signAccessToken({
             sub: newUser.id,
-            role: newUser.role as 'ADMIN' | 'USER',
+            role: newUser.role as Role,
             permissions: []
         })
         return res.status(201).json({token, user: { id:newUser.id, email: newUser.email, role: newUser.role, name: newUser.get('name') }});
@@ -61,7 +62,7 @@ export const login = async (req: Request, res: Response) => {
         }
         const token = signAccessToken({
             sub: user.id,
-            role: user.role as 'ADMIN' | 'USER',
+            role: user.role as Role,
 
             permissions: []
         })
