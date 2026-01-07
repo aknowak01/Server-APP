@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose'
 import bcrypt from 'bcrypt'
-
-export type Role = 'USER' | 'ADMIN'
+import { Role } from './roleModels'
 
 export interface IUser extends Document {
     email: string
@@ -29,8 +28,8 @@ const userSchema = new Schema<IUser>({
     },
     role: {
         type: String,
-        enum: ['USER', 'ADMIN'],
-        default: 'USER',
+        enum: Object.values(Role),
+        default: Role.USER,
     },
     isActive: {
         type: Boolean,
