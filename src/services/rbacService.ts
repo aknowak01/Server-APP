@@ -7,7 +7,8 @@ export const Permissions: Permission[] = [
     { name: 'READ_FORMS', },
     { name: 'WRITE_FORMS', description: 'Permission to write articles' },
     { name: 'DELETE_FORMS', description: 'Permission to delete articles'},
-    { name: 'MANAGE_USERS', description: 'Permission to manage users'},];
+    { name: 'MANAGE_USERS', description: 'Permission to manage users'},
+];
 
 
 export function hasPermission(userPermissions: string[], requiredPermission: string): boolean {

@@ -19,7 +19,6 @@ export function auth(req: Request, res: Response, next: NextFunction) {
             return next();
         }
 
-
         try {
             const payload = verifyAccessToken(token);
             (req as AuthRequest).user = payload;
@@ -34,16 +33,11 @@ export function auth(req: Request, res: Response, next: NextFunction) {
 }
 export default auth;
 
-
-
-
 export function clearAuth(req: AuthRequest, res: Response, next: NextFunction) {
     delete req.user;
     delete req.userId;
     return next();
 }
-
-
 
 export function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
     const auth = req.headers.authorization;
